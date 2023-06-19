@@ -1,0 +1,11 @@
+config.json
+reactions_log.csv
+session.txt
+store
+venv
+
+# signal-cli install
+signal-cli
+
+# script archives
+old

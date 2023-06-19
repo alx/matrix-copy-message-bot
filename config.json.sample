@@ -1,0 +1,44 @@
+{
+    "control": {
+        "server_url": "https://matrix.org",
+        "username": "MATRIX_BOT_USERNAME",
+        "password": "MATRIX_BOT_PASSWORD",
+        "control_room_id": "MATRIX_CONTROL_CHATROOM_ID",
+        "log_file": "reactions_log.csv",
+        "signal_origin_number": "+123456789",
+        "dry_run": false
+    },
+    "triggers": [
+        {
+            "description": "dry_run test, send message to control room",
+            "emoji_triggers": [
+                ":test_tube:"
+            ],
+            "destination_rooms": [
+                {
+                    "description": "control-room",
+                    "id": "MATRIX_CONTROL_CHATROOM_ID",
+                    "network": "matrix"
+                }
+            ]
+        },
+        {
+            "description": "raise your cowboy hat",
+            "emoji_triggers": [
+                ":cowboy_hat_face:"
+            ],
+            "destination_rooms": [
+                {
+                    "description": "signal-chatroom",
+                    "id": "SIGNAL_DESTINATION_GROUP_ID",
+                    "network": "signal"
+                },
+                {
+                    "description": "matrix-chatroom",
+                    "id": "MATRIX_DESTINATION_CHATROOM_ID",
+                    "network": "matrix"
+                }
+            ]
+        }
+    ]
+}
