@@ -1,12 +1,25 @@
 {
     "control": {
-        "server_url": "https://matrix.org",
-        "username": "MATRIX_BOT_USERNAME",
-        "password": "MATRIX_BOT_PASSWORD",
-        "control_room_id": "MATRIX_CONTROL_CHATROOM_ID",
-        "log_file": "reactions_log.csv",
-        "signal_origin_number": "+123456789",
-        "dry_run": false
+        "ingest_rooms": [
+            {
+                "protocol": "matrix",
+                "server_url": "https://matrix.org",
+                "username": "MATRIX_BOT_USERNAME",
+                "password": "MATRIX_BOT_PASSWORD",
+                "room_id": "MATRIX_CONTROL_CHATROOM_ID"
+            }
+        ],
+        "rocketchat": {
+            "username": "ROCKETCHAT_USERNAME",
+            "password": "ROCKETCHAT_PASSWORD",
+            "server_url": "ROCKETCHAT_SERVER_URL"
+        },
+        "signal": {
+            "enabled": true,
+            "url": "http://localhost:8080/v2/send",
+            "origin_number": "+123456789"
+        },
+        "log_file": "reactions_log.csv"
     },
     "triggers": [
         {
@@ -17,8 +30,13 @@
             "destination_rooms": [
                 {
                     "description": "control-room",
-                    "id": "MATRIX_CONTROL_CHATROOM_ID",
-                    "network": "matrix"
+                    "room_id": "MATRIX_CONTROL_CHATROOM_ID",
+                    "protocol": "matrix"
+                },
+                {
+                    "description": "rocket-test-room",
+                    "room_id": "ROCKETCHAT_CHANNEL",
+                    "protocol": "rocketchat"
                 }
             ]
         },
@@ -30,13 +48,13 @@
             "destination_rooms": [
                 {
                     "description": "signal-chatroom",
-                    "id": "SIGNAL_DESTINATION_GROUP_ID",
-                    "network": "signal"
+                    "room_id": "SIGNAL_DESTINATION_GROUP_ID",
+                    "protocol": "signal"
                 },
                 {
                     "description": "matrix-chatroom",
-                    "id": "MATRIX_DESTINATION_CHATROOM_ID",
-                    "network": "matrix"
+                    "room_id": "MATRIX_DESTINATION_CHATROOM_ID",
+                    "protocol": "matrix"
                 }
             ]
         }
