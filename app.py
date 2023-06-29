@@ -24,7 +24,11 @@ def read_config(file: str):
     with open(file, "r") as f:
         return json.load(f)
 
-config = read_config(CONFIG_FILE)
+try:
+    config = read_config(CONFIG_FILE)
+except:
+    print("Error: missing config.json file")
+    exit(0)
 
 # TODO: use multiple bots for multiple ingest rooms
 ingest_room = config["control"]["ingest_rooms"][0]
