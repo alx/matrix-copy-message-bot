@@ -88,66 +88,62 @@ def get_specific_tweet(tweet_id):
 
     return response.json()
 
+def format_content(trigger, content):
+
+    formatted_content = content
+
+    site_name = ""
+    title = ""
+    description = ""
+
+    try:
+
+        content_url = re.search("(?P<url>https?://[^\s]+)", content).group("url")
+
+        if len(content_url) > 0:
+
+            if content_url.startswith("https://twitter.com"):
+
+                tweet = get_specific_tweet(content_url.split("/")[-1])
+                site_name = "Twitter"
+                title = tweet["user"]["name"]
+                description = tweet["text"]
+
+            else:
+
+                og = opengraph_py3.OpenGraph(url=content_url)
+                site_name = og.site_name
+
+                if og.site_name != "GitHub":
+                    title = og.title
+                    description = og.description
+
+            if len(description) > 0:
+                formatted_content = f"{description} / {content.replace('twitter.com', 'nitter.net')} / {emoji.emojize(trigger)}"
+            else:
+                formatted_content = f"{content} / {emoji.emojize(trigger)}"
+        else :
+            formatted_content = f"{content} / {emoji.emojize(trigger)}"
+
+    except Exception as er:
+        print(f"Error formatting content: {content}")
+        print(er)
+
+    return formatted_content
+
+
 def save_history(trigger, room, content):
 
-    message_content = content
-
     with open(config["control"]["log_file"], mode='a') as file_:
-
-        site_name = ""
-        title = ""
-        description = ""
-
-        try:
-
-            content_url = re.search("(?P<url>https?://[^\s]+)", content).group("url")
-
-            if len(content_url) > 0:
-
-                if content_url.startswith("https://twitter.com"):
-
-                    tweet = get_specific_tweet(content_url.split("/")[-1])
-                    pprint.pprint(tweet)
-                    pprint.pprint(tweet["text"])
-                    site_name = "Twitter"
-                    title = tweet["user"]["name"]
-                    description = tweet["text"]
-
-                else:
-
-                    og = opengraph_py3.OpenGraph(url=content_url)
-                    site_name = og.site_name
-
-                    if og.site_name != "GitHub":
-                        title = og.title
-                        description = og.description
-
-                if len(description) > 0:
-                    message_content = f"{description} / {content.replace('twitter.com', 'nitter.net')} / {emoji.emojize(trigger)}"
-                else:
-                    message_content = f"{content} / {emoji.emojize(trigger)}"
-            else :
-                message_content = f"{content} / {emoji.emojize(trigger)}"
-
-        except Exception as er:
-            print(f"Error while modifying content: {content}")
-            print(er)
-
-
         file_.write(
-            "{},{},{},{},{},{},{}".format(
+            "{},{},{},{}".format(
                 datetime.now(),
                 trigger,
                 room,
-                content,
-                site_name,
-                title,
-                description
+                content
             )
         )
         file_.write("\n")
-
-    return message_content
 
 async def send_message(destination_room, content):
 
@@ -369,18 +365,23 @@ async def on_reaction(room, event, reaction):
                 trigger_found = True
 
                 # format message from event content
-                message_content = save_history(
+                formatted_content = format_content(
                     trigger,
-                    destination_room,
                     content
                 )
 
                 for destination_room in trigger_item["destination_rooms"]:
 
+                    save_history(
+                        trigger,
+                        destination_room,
+                        content
+                    )
+
                     # send message to destination room
                     await send_message(
                         destination_room,
-                        message_content
+                        formatted_content
                     )
 
         if not trigger_found:
